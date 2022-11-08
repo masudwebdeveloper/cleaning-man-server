@@ -13,20 +13,19 @@ app.use(express.json());
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.jfl1bty.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 
-function veriryJWT(req, res, next) {
+function verifyJWT(req, res, next) {
    const authHeader = req.headers.authorization;
    if (!authHeader) {
       return res.status(401).send({message: 'unauthorization access'})
    }
    const token = authHeader.split(' ')[1];
-   jwt.verify(token, process.env.ACCESS_TOKEN_SECRECT, function (err, decoded) {
+   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, function (err, decoded) {
       if (err) {
          return res.status(401).send({message: 'unauthorization access'})
       }
       req.decoded = decoded
       next()
    })
-   console.log(authHeader);
 }
 
 async function run() {
@@ -36,7 +35,7 @@ async function run() {
 
       app.post('/jwt', async (req, res) => {
          const user = req.body;
-         const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRECT, { expiresIn: '5' })
+         const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
          res.send({token})
       })
 
@@ -62,7 +61,7 @@ async function run() {
          res.send(result);
       })
 
-      app.get('/reviews', veriryJWT, async (req, res) => {
+      app.get('/reviews', verifyJWT, async (req, res) => {
          const decoded = req.decoded;
          if (decoded.email !== req.query.email) {
             return res.status(403).send({message: 'forbidden access'})
