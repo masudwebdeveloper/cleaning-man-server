@@ -35,7 +35,7 @@ async function run() {
 
       app.post('/jwt', async (req, res) => {
          const user = req.body;
-         const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
+         const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '5d' })
          res.send({ token })
       })
 
@@ -107,7 +107,6 @@ async function run() {
          }
          const result = await reviewsCollection.updateOne(filter, updateUser, option);
          res.send(result)
-         console.log(result);
       })
 
       // for delete
