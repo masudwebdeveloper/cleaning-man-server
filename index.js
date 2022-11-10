@@ -61,6 +61,14 @@ async function run() {
          res.send(result);
       })
 
+      //for update
+      app.get('/reviews/:id', async (req, res) => {
+         const id = req.params.id;
+         const query = { _id: ObjectId(id) };
+         const user = await reviewsCollection.findOne(query);
+         res.send(user);
+      })
+
       // this is all review collection api
       app.get('/allreviews', async (req, res) => {
          const query = {};
@@ -85,12 +93,32 @@ async function run() {
          res.send(review);
       })
 
+      //for update
+      app.patch('/reviews/:id', async (req, res) => {
+         const id = req.params.id;
+         const filter = { _id: ObjectId(id) };
+         const user = req.body;
+         const option = { upsert: true };
+         const updateUser = {
+            $set: {
+               clientName: user.clientName,
+               message: user.message
+            }
+         }
+         const result = await reviewsCollection.updateOne(filter, updateUser, option);
+         res.send(result)
+         console.log(result);
+      })
+
+      // for delete
       app.delete('/reviews/:id', async (req, res) => {
          const id = req.params.id;
          const query = { _id: ObjectId(id) };
          const result = await reviewsCollection.deleteOne(query);
          res.send(result);
       })
+
+      
    }
    finally {
 
